@@ -1,13 +1,14 @@
 ﻿namespace Axis.OpcUa.Station.Services;
 public class OpcuaManagement
 {
-    public static void CreateServerInstance()
-    {
+    public static async Task CreateServerInstance()
+    {//https://blog.csdn.net/qq_32663557/article/details/108062820
         try
         {
+            var rootPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
             ApplicationConfiguration configuration = new()
             {
-                ApplicationName = "FEELER-SMB",
+                ApplicationName = "FFG.iMDS.IIoT",
                 ApplicationUri = Utils.Format(@$"urn:{Dns.GetHostName()}:OpcUa"),
                 ApplicationType = ApplicationType.Server,
                 ServerConfiguration = new()
@@ -21,24 +22,24 @@ public class OpcuaManagement
                 {
                     ApplicationCertificate = new()
                     {
-                        StoreType = @"Directory",
-                        StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\MachineDefault",
+                        StoreType = "Directory",
+                        StorePath = Path.Combine(rootPath, "OPC Foundation", "CertificateStores", "MachineDefault"),
                         SubjectName = Utils.Format(@$"CN={"OpcUa"}, DC={Dns.GetHostName()}")
                     },
                     TrustedIssuerCertificates = new()
                     {
-                        StoreType = @"Directory",
-                        StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\UA Certificate Authorities"
+                        StoreType = "Directory",
+                        StorePath = Path.Combine(rootPath, "OPC Foundation", "CertificateStores", "UA Certificate Authorities")
                     },
                     TrustedPeerCertificates = new()
                     {
-                        StoreType = @"Directory",
-                        StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\UA Applications"
+                        StoreType = "Directory",
+                        StorePath = Path.Combine(rootPath, "OPC Foundation", "CertificateStores", "UA Applications")
                     },
                     RejectedCertificateStore = new()
                     {
-                        StoreType = @"Directory",
-                        StorePath = @"%CommonApplicationData%\OPC Foundation\CertificateStores\RejectedCertificates"
+                        StoreType = "Directory",
+                        StorePath = Path.Combine(rootPath, "OPC Foundation", "CertificateStores", "RejectedCertificates")
                     },
                     AutoAcceptUntrustedCertificates = true,
                     AddAppCertToTrustedStore = true
@@ -55,7 +56,7 @@ public class OpcuaManagement
                 TraceConfiguration = new()
             };
 
-            configuration.Validate(ApplicationType.Server).GetAwaiter().GetResult();
+            await configuration.Validate(ApplicationType.Server);
             if (configuration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
             {
                 configuration.CertificateValidator.CertificateValidation += (s, e) =>
@@ -71,13 +72,27 @@ public class OpcuaManagement
                 ApplicationConfiguration = configuration
             };
 
-            var certOk = application.CheckApplicationInstanceCertificate(false, 0).Result;
+            var certOk = await application.CheckApplicationInstanceCertificate(default, default);
 
             if (!certOk) Console.WriteLine("證書驗證失敗!");
 
             var dis = new DiscoveryServerBase();
 
-            application.Start(new OpcuaServer()).Wait();
+            var server = new OpcuaServer();
+         
+
+            server.CurrentInstance.SessionManager.SessionClosing += (session, reason) =>
+            {//斷開
+                var HH = session.SessionDiagnostics.SessionName;
+
+            };
+            server.CurrentInstance.SessionManager.ImpersonateUser += (session, args) =>
+            {//連上
+                var HH = session.SessionDiagnostics.SessionName;
+
+            };
+            await application.Start(server);
+            var DD = server.CurrentInstance.SessionManager.GetSessions();
         }
         catch (Exception ex)
         {

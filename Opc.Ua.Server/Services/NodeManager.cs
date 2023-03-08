@@ -339,7 +339,8 @@ namespace Axis.OpcUa.Station.Services
                 //variable.Value = GetNewValue(variable);
                 StatusCode = StatusCodes.Good,
                 Timestamp = DateTime.Now,
-                OnWriteValue = OnWriteDataValue
+                OnWriteValue = OnWriteDataValue,
+                OnReadValue = OnReadDataValue
             };
 
             if (valueRank == ValueRanks.OneDimension)
@@ -353,6 +354,12 @@ namespace Axis.OpcUa.Station.Services
 
             parent?.AddChild(variable);
             return variable;
+        }
+
+        private ServiceResult OnReadDataValue(ISystemContext context, NodeState node, NumericRange indexRange, QualifiedName dataEncoding, ref object value, ref StatusCode statusCode, ref DateTime timestamp)
+        {
+
+            return ServiceResult.Good;
         }
 
         /// <summary>

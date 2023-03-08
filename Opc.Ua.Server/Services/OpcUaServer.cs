@@ -1,5 +1,5 @@
 ﻿namespace Axis.OpcUa.Station.Services;
-public class OpcuaServer : StandardServer
+public sealed class OpcuaServer : StandardServer
 {
     /// <summary>
     /// 為服務器創建節點管理器

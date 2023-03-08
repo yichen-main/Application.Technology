@@ -5,7 +5,7 @@
     .CreateLogger();
 try
 {
-    OpcuaManagement.CreateServerInstance();
+    await OpcuaManagement.CreateServerInstance();
     Console.WriteLine("OPC UA 服務已啟動...");
     Console.ReadLine();
 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opc.Ua.Server", "Opc.Ua.Server\Opc.Ua.Server.csproj", "{9A8FFA37-56C5-40B4-86E6-05824F2CF145}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpcUa.Server", "Opc.Ua.Server\OpcUa.Server.csproj", "{9A8FFA37-56C5-40B4-86E6-05824F2CF145}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
